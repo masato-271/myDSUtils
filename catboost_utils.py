@@ -4,8 +4,8 @@ import pandas as pd
 from pathlib import Path
 import shutil
 
-def get_feature_importance_df(model, feature_name):
-    d_importance = pd.DataFrame({'feature_name':feature_name, 'imp':model.get_feature_importance()})
+def get_feature_importance_df(model):
+    d_importance = pd.DataFrame({'feature_name':model.feature_names_, 'imp':model.get_feature_importance()})
     d_importance.sort_values(['imp'], ascending=False, inplace=True)
     return d_importance
 
@@ -38,3 +38,7 @@ def get_shapValue_df(model, pool):
     _d = pd.DataFrame(model.get_feature_importance(pool, type='ShapValues'), columns=cn)
 
     return _d
+
+def get_object_col_idx(d):
+    bix =  d.columns.isin(d.columns[d.dtypes == object])
+    return list(np.where(bix))[0]

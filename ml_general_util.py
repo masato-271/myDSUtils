@@ -8,11 +8,15 @@ def na_count_per_column(d):
     tmp_d.columns = ['colname', 'na_count']
     return tmp_d
 
-def drop_unique_value_column(d):
-    _d = d.apply(lambda x: len(x.unique()), axis='rows')
-    _d = pd.DataFrame(_d).reset_index()
+def get_unique_value_count(d):
+    _d = d.apply(lambda x: len(x.unique()), axis='rows').to_frame().reset_index()
     _d.columns = ['colname', 'n_unique']
-    _cn = list(_d[_d.n_unique == 1]['colname'])
+
+    return _d
+
+def drop_unique_value_column(d):
+    _d = get_unique_value_count(d)
+    _cn = list(_d.query('n_unique == 1'))
     if(len(_cn)>0):
         print('following column(s) drop')
         print(_cn)
