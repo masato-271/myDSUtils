@@ -2,6 +2,7 @@
 from sklearn import datasets
 import pandas as pd 
 import numpy as np 
+import datetime
 
 def __check_str_col(d, cn):
     x = d[cn]
@@ -72,4 +73,12 @@ def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''
     d =  d.merge(tmp_d, on=grouping_colnames, how='left')
     return d
 
-
+def print_func_name(func):
+    def f(*args, **k):
+        t0 = datetime.datetime.now()
+        print(func.__name__, 'start')
+        result = func(*args, **k)
+        print(func.__name__, 'end')
+        print('processing time::\t\t\t', str(datetime.datetime.now() - t0))
+        return result
+    return f
