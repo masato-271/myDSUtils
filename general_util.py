@@ -3,6 +3,10 @@ from sklearn import datasets
 import pandas as pd 
 import numpy as np 
 import datetime
+from logging import getLogger
+
+logger = getLogger(__name__)
+
 
 def __check_str_col(d, cn):
     x = d[cn]
@@ -76,9 +80,29 @@ def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''
 def print_func_name(func):
     def f(*args, **k):
         t0 = datetime.datetime.now()
-        print(func.__name__, 'start')
+        logger.info(func.__name__+'\t\t\tstart')
         result = func(*args, **k)
-        print(func.__name__, 'end')
-        print('processing time::\t\t\t', str(datetime.datetime.now() - t0))
+        logger.info(func.__name__+'\t\t\tend')
+        logger.info('processing time::\t\t\t' + str(datetime.datetime.now() - t0))
         return result
     return f
+
+
+from pathlib import Path 
+import shutil
+
+def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
+    if type(target_dir) == str:
+        target_dir = Path(target_dir)
+    archive_dir = target_dir / 'old'
+
+    if not archive_dir.exists():
+        archive_dir.mkdir()
+
+    files = [x for x in target_dir.iterdir() if x.suffix == target_ext]
+    files.sort()
+    archive_files = files[0:(len(files)-n_max_files)]
+    if len(archive_files) > n_max_files:
+        for x in archive_files:
+            shutil.move(x, archive_dir / x.name)
+

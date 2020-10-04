@@ -23,10 +23,12 @@ def clear_catboost_info_dir(target_dir='./catboost_info'):
         shutil.rmtree(os.path.join(target_dir, 'learn'))
     except:
         pass
+
     try:
         shutil.rmtree(os.path.join(target_dir, 'test'))
     except:
         pass
+
     try:
         shutil.rmtree(os.path.join(target_dir, 'tmp'))
     except:
