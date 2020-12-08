@@ -1,6 +1,8 @@
 import datetime
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt 
+import seaborn as sns 
 from myDSUtils.general_util import print_func_name
 
 def na_count_per_column(d):
@@ -43,15 +45,15 @@ def is_ipython_env():
     return True
 
 @print_func_name
-def bind_data(d_train, d_test):
-    d_test['y'] = -1
+def bind_data(d_train, d_test, target_colname):
+    d_test[target_colname] = -1
     d = d_train.append(d_test).reset_index(drop=True)
     return(d)
 
 @print_func_name
-def resplit_data(d):
-    d_train = d[d['y'] >= 0].copy()
-    d_test = d[d['y'] < 0].copy()
+def resplit_data(d, target_colname):
+    d_train = d[d[target_colname] >= 0].copy()
+    d_test = d[d[target_colname] < 0].copy()
     return(d_train, d_test)
 
 from pathlib import Path 
@@ -88,3 +90,32 @@ def add_agg_stats_cols(
             d = d.merge(tmp_d, how='left', right_on=grouping_key)
     
     return(d)
+
+@print_func_name
+def get_top_diff_df(y, pred, n_sample=100, mode='head'):
+    d = pd.DataFrame((y - pred).values, columns=['err'])
+    d['abs_err'] = d['err'].abs()
+    d['y'] = y.values
+    d['pred'] = pred
+    d.reset_index(inplace=True)
+    if mode=='head':
+        sampled_d = d.sort_values(['abs_err']).head(n_sample)
+    else:
+        sampled_d = d.sort_values(['abs_err']).tail(n_sample)
+
+    return(sampled_d)
+
+@print_func_name
+def compare_pred_gt_plot(y, pred, log=''):
+    plt.clf()
+    f, ax = plt.subplots(figsize=(7,7))
+    if log=='x':
+        ax.set(xscale='log')
+    elif log=='y':
+        ax.set(yscale='log')
+    elif log=='xy':
+        ax.set(xscale='log', yscale='log')
+
+    sns.histplot(y, binwidth=2, ax=ax, color='red')
+    sns.histplot(pred, binwidth=2, ax=ax, color='blue')
+    plt.show()

@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import shutil
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def get_feature_importance_df(model):
     d_importance = pd.DataFrame({'feature_name':model.feature_names_, 'imp':model.get_feature_importance()})
@@ -44,3 +46,21 @@ def get_shapValue_df(model, pool):
 def get_object_col_idx(d):
     bix =  d.columns.isin(d.columns[d.dtypes == object])
     return list(np.where(bix))[0]
+
+def plot_catboost_learning_curve(loss_function='RMSE', log_dir='./catboost_info/'):
+    if type(log_dir) == str:
+        log_dir = Path(log_dir)
+
+    d_learn = pd.read_table(log_dir / 'learn_error.tsv')
+
+    plt.clf()
+    f, ax = plt.subplots()
+    sns.lineplot(x='iter', y=loss_function, data=d_learn, label='Learn')
+
+    # テスト分があれば、その分もプロット
+    f = log_dir / 'test_error.tsv'
+    if os.path.exists(f):
+        d_test = pd.read_table(f)
+        sns.lineplot(x='iter', y=loss_function, data=d_test, label='Test')
+    ax.legend()
+    plt.show()
