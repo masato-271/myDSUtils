@@ -48,7 +48,7 @@ def is_ipython_env():
 def bind_data(d_train, d_test, target_colname):
     d_train['data_type'] = 'train'
     d_test['data_type'] = 'test'
-    d_test[target_colname] = -1
+    # d_test[target_colname] = -1
     d = d_train.append(d_test).reset_index(drop=True)
     return(d)
 
@@ -110,7 +110,7 @@ def get_top_diff_df(y, pred, n_sample=100, mode='head'):
     return(sampled_d)
 
 @print_func_name
-def compare_pred_gt_plot(y, pred, log=''):
+def compare_pred_gt_plot(y, pred, fn='', log=''):
     plt.clf()
     f, ax = plt.subplots(figsize=(7,7))
     if log=='x':
@@ -122,4 +122,6 @@ def compare_pred_gt_plot(y, pred, log=''):
 
     sns.histplot(y, binwidth=2, ax=ax, color='red')
     sns.histplot(pred, binwidth=2, ax=ax, color='blue')
-    plt.show()
+    if fn != '':
+        plt.savefig(f'./plot/{fn}.png')
+

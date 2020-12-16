@@ -3,6 +3,10 @@ from sklearn import datasets
 import pandas as pd 
 import numpy as np 
 import datetime
+from pathlib import Path 
+import shutil
+import types
+
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -77,20 +81,6 @@ def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''
     d =  d.merge(tmp_d, on=grouping_colnames, how='left')
     return d
 
-def print_func_name(func):
-    def f(*args, **k):
-        t0 = datetime.datetime.now()
-        logger.info(func.__name__+'\t\t\tstart')
-        result = func(*args, **k)
-        logger.info(func.__name__+'\t\t\tend')
-        logger.info('processing time::\t\t\t' + str(datetime.datetime.now() - t0))
-        return result
-    return f
-
-
-from pathlib import Path 
-import shutil
-
 def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
     if type(target_dir) == str:
         target_dir = Path(target_dir)
@@ -106,3 +96,36 @@ def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
         for x in archive_files:
             shutil.move(x, archive_dir / x.name)
 
+
+# original code:
+# https://gist.github.com/ax3l/59d92c6e1edefcef85ac2540eb056da3
+# 
+# License:
+#   I hereby state this snippet is below "threshold of originality" where applicable (public domain).
+#
+# Otherwise, since initially posted on Stackoverflow, use as:
+#   CC-BY-SA 3.0 skyking, Glenn Maynard, Axel Huebl
+#   http://stackoverflow.com/a/31047259/2719194
+#   http://stackoverflow.com/a/4858123/2719194
+
+def imports():
+    for name, val in globals().items():
+        # module imports
+        if isinstance(val, types.ModuleType):
+            yield name, val
+        # functions / callables
+        if hasattr(val, '__call__'):
+            yield name, val
+
+noglobal = lambda fn: types.FunctionType(fn.__code__, dict(imports()))
+
+
+def print_func_name(func):
+    def f(*args, **k):
+        t0 = datetime.datetime.now()
+        logger.info(func.__name__+'\t\t\tstart')
+        result = func(*args, **k)
+        logger.info(func.__name__+'\t\t\tend')
+        logger.info('processing time::\t\t\t' + str(datetime.datetime.now() - t0))
+        return result
+    return f
