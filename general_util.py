@@ -93,7 +93,7 @@ def print_func_name(func):
         sign = '+' if mem_usage_delta >= 0 else '-'
         mem_usage_delta = math.fabs(mem_usage_delta)
 
-        logger.info(f'{func.__name__}\t\t\tend\tproc time:{str(datetime.datetime.now() - t0)}\t[{m1:.1f}GB({sign}{mem_usage_delta:.1f}GB)')
+        logger.info(f'{func.__name__}\t\t\tend\tproc time:{str(datetime.datetime.now() - t0)}\t[{m1:.1f}GB({sign}{mem_usage_delta:.1f}GB)]')
         return result
     return f
 
