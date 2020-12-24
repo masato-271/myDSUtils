@@ -46,14 +46,16 @@ def is_ipython_env():
 
 @print_func_name
 def bind_data(d_train, d_test, target_colname):
-    d_test[target_colname] = -1
+    d_train['data_type'] = 'train'
+    d_test['data_type'] = 'test'
+    # d_test[target_colname] = -1
     d = d_train.append(d_test).reset_index(drop=True)
     return(d)
 
 @print_func_name
 def resplit_data(d, target_colname):
-    d_train = d[d[target_colname] >= 0].copy()
-    d_test = d[d[target_colname] < 0].copy()
+    d_train = d[d['data_type']=='train'].drop('data_type', axis='columns').copy()
+    d_test = d[d['data_type']=='test'].drop('data_type', axis='columns').copy()
     return(d_train, d_test)
 
 from pathlib import Path 
@@ -82,12 +84,14 @@ def add_agg_stats_cols(
     agg_targets:List[str], 
     agg_functions:List[str]
     ):
+
+    tmp_d1 = d[d['data_type']=='train'].copy()
     for af in agg_functions:
         for at in agg_targets:
             tmp_colname = f"agg_{at}_{af}_groupby_{''.join(grouping_key)}"
-            tmp_d = d.groupby(grouping_key)[[at]].agg(af)
+            tmp_d = tmp_d1.groupby(grouping_key)[[at]].agg(af)
             tmp_d.columns = [tmp_colname]
-            d = d.merge(tmp_d, how='left', right_on=grouping_key)
+            d = d.merge(tmp_d, how='left', on=grouping_key)
     
     return(d)
 
@@ -106,7 +110,7 @@ def get_top_diff_df(y, pred, n_sample=100, mode='head'):
     return(sampled_d)
 
 @print_func_name
-def compare_pred_gt_plot(y, pred, log=''):
+def compare_pred_gt_plot(y, pred, fn='', log=''):
     plt.clf()
     f, ax = plt.subplots(figsize=(7,7))
     if log=='x':
@@ -118,4 +122,6 @@ def compare_pred_gt_plot(y, pred, log=''):
 
     sns.histplot(y, binwidth=2, ax=ax, color='red')
     sns.histplot(pred, binwidth=2, ax=ax, color='blue')
-    plt.show()
+    if fn != '':
+        plt.savefig(f'./plot/{fn}.png')
+
