@@ -1,7 +1,9 @@
-# %% 
+import os
 from sklearn import datasets
 import pandas as pd 
 import numpy as np 
+import math
+import psutil
 import datetime
 from logging import getLogger
 
@@ -80,10 +82,18 @@ def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''
 def print_func_name(func):
     def f(*args, **k):
         t0 = datetime.datetime.now()
+        p = psutil.Process(os.getpid())
+        m0 = p.memory_info()[0] / 2. ** 30
+
         logger.info(func.__name__+'\t\t\tstart')
         result = func(*args, **k)
-        logger.info(func.__name__+'\t\t\tend')
-        logger.info('processing time::\t\t\t' + str(datetime.datetime.now() - t0))
+
+        m1 = p.memory_info()[0] / 2. ** 30
+        mem_usage_delta = m1 - m0
+        sign = '+' if mem_usage_delta >= 0 else '-'
+        mem_usage_delta = math.fabs(mem_usage_delta)
+
+        logger.info(f'{func.__name__}\t\t\tend\tproc time:{str(datetime.datetime.now() - t0)}\t[{m1:.1f}GB({sign}{mem_usage_delta:.1f}GB)')
         return result
     return f
 
