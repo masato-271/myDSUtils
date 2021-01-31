@@ -44,7 +44,7 @@ def is_ipython_env():
     return True
 
 @print_func_name
-def bind_data(d_train, d_test, target_colname):
+def bind_data(d_train, d_test):
     d_train['data_type'] = 'train'
     d_test['data_type'] = 'test'
     # d_test[target_colname] = -1
