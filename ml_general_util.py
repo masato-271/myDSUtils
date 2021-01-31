@@ -19,13 +19,12 @@ def get_unique_value_count(d):
 
 def drop_unique_value_column(d):
     _d = get_unique_value_count(d)
-    _cn = list(_d.query('n_unique == 1'))
+    _cn = list(_d.query('n_unique == 1').colname.values)
     if(len(_cn)>0):
         print('following column(s) drop')
         print(_cn)
         d.drop(_cn, axis='columns', inplace=True)
-
-    return d
+    return(d, _cn)
 
 def get_now_str():
     str_now = datetime.datetime.now().strftime('%Y%m%d-%H%M')
