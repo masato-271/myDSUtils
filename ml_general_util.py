@@ -24,6 +24,8 @@ def drop_unique_value_column(d):
         print('following column(s) drop')
         print(_cn)
         d.drop(_cn, axis='columns', inplace=True)
+    else:
+        _cn = None
     return(d, _cn)
 
 def get_now_str():
@@ -48,11 +50,11 @@ def bind_data(d_train, d_test):
     d_train['data_type'] = 'train'
     d_test['data_type'] = 'test'
     # d_test[target_colname] = -1
-    d = d_train.append(d_test).reset_index(drop=True)
+    d = d_train.append(d_test).reset_index(drop=True).copy()
     return(d)
 
 @print_func_name
-def resplit_data(d, target_colname):
+def resplit_data(d):
     d_train = d[d['data_type']=='train'].drop('data_type', axis='columns').copy()
     d_test = d[d['data_type']=='test'].drop('data_type', axis='columns').copy()
     return(d_train, d_test)

@@ -116,3 +116,12 @@ def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
         for x in archive_files:
             shutil.move(x, archive_dir / x.name)
 
+def get_latest_filename(search_root_dir, target_suffix):
+  if type(search_root_dir) == str:
+    search_root_dir = Path(search_root_dir)
+  ret = []
+  for p in search_root_dir.iterdir():
+    if p.suffix == target_suffix:
+      ret.append(p)
+  ret.sort()
+  return(ret[-1])
