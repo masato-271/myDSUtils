@@ -86,10 +86,14 @@ def add_agg_stats_cols(
     agg_functions:List[str]
     ):
 
+    if type(agg_targets) == str:
+        agg_targets = [agg_targets]
+        
     tmp_d1 = d[d['data_type']=='train'].copy()
     for af in agg_functions:
         for at in agg_targets:
             tmp_colname = f"agg_{at}_{af}_groupby_{''.join(grouping_key)}"
+            print(tmp_colname)
             tmp_d = tmp_d1.groupby(grouping_key)[[at]].agg(af)
             tmp_d.columns = [tmp_colname]
             d = d.merge(tmp_d, how='left', on=grouping_key)
