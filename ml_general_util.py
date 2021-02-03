@@ -30,6 +30,7 @@ def drop_unique_value_column(d):
 
 def get_now_str():
     str_now = datetime.datetime.now().strftime('%Y%m%d-%H%M')
+    print(f'now: {str_now}')
     return str_now
 
 def is_ipython_env():
@@ -129,4 +130,32 @@ def compare_pred_gt_plot(y, pred, fn='', log=''):
     sns.histplot(pred, binwidth=2, ax=ax, color='blue')
     if fn != '':
         plt.savefig(f'./plot/{fn}.png')
+
+@print_func_name
+def make_flg_variable(d, target_col, find_str):
+  d[f'{target_col}__flag_{find_str}'] = d[target_col].str.match(f'.*{find_str}.*').astype(int)
+  return(d)
+
+@print_func_name
+def get_ix_order_df(d, n=1, value_mode='', order_mode='largest', exclude_colnames=['<base>']):
+  # 各行毎にn番目に大きい要素の列番号を取得
+  # 最大値が複数ある場合はすべてのカラム位置を返す
+  if value_mode=='abs':
+    tmp_d = d.abs()
+  else:
+    tmp_d = d
+
+  if order_mode=='largest':
+    df_ix = tmp_d.drop(exclude_colnames, errors='ignore', axis=1).apply(lambda x: np.where(x == x.nlargest(n).values[0])[0], axis=1)
+    return(df_ix)
+  elif order_mode=='smallest':
+    df_ix = tmp_d.drop(exclude_colnames, errors='ignore', axis=1).apply(lambda x: np.where(x == x.nsmallest(n).values[0])[0], axis=1)
+    return(df_ix)
+
+@print_func_name
+def get_largest_valued_colname(d, value_mode=''):
+  d_ix = get_ix_order_df(d, value_mode=value_mode)
+  d_colnames = d_ix.apply(lambda x: list(d.columns[x]))
+  return(d_colnames)
+
 
