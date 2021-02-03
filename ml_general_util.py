@@ -147,15 +147,14 @@ def get_ix_order_df(d, n=1, value_mode='', order_mode='largest', exclude_colname
 
   if order_mode=='largest':
     df_ix = tmp_d.drop(exclude_colnames, errors='ignore', axis=1).apply(lambda x: np.where(x == x.nlargest(n).values[0])[0], axis=1)
-    return(df_ix)
   elif order_mode=='smallest':
     df_ix = tmp_d.drop(exclude_colnames, errors='ignore', axis=1).apply(lambda x: np.where(x == x.nsmallest(n).values[0])[0], axis=1)
-    return(df_ix)
+  df_ix = df_ix.to_frame()
+  df_ix.columns = ['ix']
+  return(df_ix)
 
 @print_func_name
 def get_largest_valued_colname(d, value_mode=''):
   d_ix = get_ix_order_df(d, value_mode=value_mode)
-  d_colnames = d_ix.apply(lambda x: list(d.columns[x]))
+  d_colnames = d_ix.apply(lambda x: list(d.columns[x]), axis=1)
   return(d_colnames)
-
-
