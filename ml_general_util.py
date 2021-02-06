@@ -154,7 +154,24 @@ def get_ix_order_df(d, n=1, value_mode='', order_mode='largest', exclude_colname
   return(df_ix)
 
 @print_func_name
-def get_largest_valued_colname(d, value_mode=''):
-  d_ix = get_ix_order_df(d, value_mode=value_mode)
+def get_each_row_value_order(d):
+    d_ix = d.apply(lambda x: np.argsort(x), axis=1)
+    return(d_ix)
+
+@print_func_name
+def get_n_largest_valued_colname(d, n=1, value_mode=''):
+  d_ix = get_ix_order_df(d, n=n, value_mode=value_mode)
   d_colnames = d_ix.apply(lambda x: list(d.columns[x]), axis=1)
   return(d_colnames)
+
+@print_func_name
+def get_n_best_shap_mat(d, n=3, value_mode=''):
+  d_ix = get_n_largest_valued_colname(d, n=n, value_mode=value_mode)
+  ret = pd.concat([d, d_ix], axis=1).apply(lambda x: x[x['ix']], axis=1)
+  return(ret)
+
+@print_func_name
+def cleanse_colname(colnames):
+    ret = ["".join (c if c.isalnum() else "_" for c in str(x)) for x in colnames]
+    return(ret)
+

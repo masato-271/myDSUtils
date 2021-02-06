@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def get_feature_importance_df(model):
-    d_importance = pd.DataFrame({'feature_name':model.feature_names_, 'imp':model.get_feature_importance()})
-    d_importance.sort_values(['imp'], ascending=False, inplace=True)
-    return d_importance
+    d_imp = pd.DataFrame({'feature_name':model.feature_names_, 'importance':model.get_feature_importance()})
+    d_imp.sort_values(['importance'], ascending=False, inplace=True)
+    return d_imp
 
 def rmsle(pred, gt):
     _pred = np.log(pred+1)
