@@ -1,11 +1,17 @@
-import os
-from sklearn import datasets
-import pandas as pd 
-import numpy as np 
-import math
-import psutil
 import datetime
+import math
+import os
+import shutil
+from pathlib import Path
+import datetime
+import dateutil
+
 from logging import getLogger
+
+import numpy as np
+import pandas as pd
+import psutil
+from sklearn import datasets
 
 logger = getLogger(__name__)
 
@@ -97,10 +103,6 @@ def print_func_name(func):
         return result
     return f
 
-
-from pathlib import Path 
-import shutil
-
 def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
     if type(target_dir) == str:
         target_dir = Path(target_dir)
@@ -125,3 +127,78 @@ def get_latest_filename(search_root_dir, target_suffix):
       ret.append(p)
   ret.sort()
   return(ret[-1])
+
+
+def calc_date_str(date_str, unit='months', qty=1, date_format='%Y-%m-%d'):
+    """文字列として持っている日付か
+
+    Args:
+        date_str (str or datetime): 計算対象とする日付
+        unit (str, optional): ずらす期間の単位. Defaults to 'months'.
+        qty (int, optional): ずらす量 ＋ーどちらでもOK. Defaults to 1.
+        date_format (str, optional): 処理対象が文字列の場合、パージするフォーマット . Defaults to '%Y-%m-%d'.
+
+    Raises:
+        ValueError: 想定していない単位を指定された場合にはエラーを出す
+    """
+
+    if unit not in ['days', 'weeks', 'months', 'years']:
+        raise ValueError('not implimented unit')
+
+    tmp_s = date_str    
+    if type(date_str) == str:
+        tmp_s = datetime.datetime.strptime(date_str, date_format)
+
+    if unit=='days':
+        tmp_delta = dateutil.relativedelta.relativedelta(days=qty)
+    elif unit=='weeks':
+        tmp_delta = dateutil.relativedelta.relativedelta(weeks=qty)
+    elif unit=='months':
+        tmp_delta = dateutil.relativedelta.relativedelta(months=qty)
+    elif unit=='years':
+        tmp_delta = dateutil.relativedelta.relativedelta(years=qty)
+    
+    ret = (tmp_s + tmp_delta).strftime(date_format)
+
+    return(ret)
+
+
+def round_datestr2quarter(date_str, date_format='%Y-%m-%d', direction='forward', month='head'):
+    """date_strで与えた日付をクオーター単位で丸める
+    directionがforwardはdate_strを起点に未来方向へ、backwardの場合は過去方向へ丸める
+    monthはreturnの月の取り扱いを指定するパラメータで、クオーターの頭の月の場合head、最後の月はtailを指定する
+
+    Args:
+        date_str (str or datetime): 処理対象とする日付
+        date_format (str, optional): パージする日付のフォーマット. Defaults to '%Y-%m-%d'.
+        direction (str, optional): 丸める方向. forward Defaults to 'forward'.
+        month (str, optional): [description]. Defaults to 'head'.
+    """
+
+    if direction not in ['forward', 'backward']:
+        raise ValueError('direction should be forward or backward')
+    
+    if month not in ['head', 'tail']:
+        raise ValueError('month should be head or tail')
+
+    tmp_s = date_str
+    if type(date_str)==str:
+        tmp_s = datetime.datetime.strptime(date_str, date_format)
+        
+    tmp_delta = dateutil.relativedelta.relativedelta(months=1)
+
+    if month=='head':
+        frac = 1
+    elif month=='tail':
+        frac = 0
+    
+    tmp_date = tmp_s
+    for i in range(4):
+        if tmp_date.month % 3 == frac:
+            break
+        if direction=='forward':
+            tmp_date += tmp_delta 
+        elif direction=='backward':
+            tmp_date -= tmp_delta
+    ret = tmp_date.strftime(date_format)[:-2] + '01'
+    return(ret)
