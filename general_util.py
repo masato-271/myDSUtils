@@ -15,7 +15,6 @@ from sklearn import datasets
 
 logger = getLogger(__name__)
 
-
 def __check_str_col(d, cn):
     x = d[cn]
     print(f'most frequently appeard value::\n{x.mode()}\n')
@@ -57,7 +56,7 @@ def check_col_stats(d, cn):
         __check_str_col(d, cn)
     elif isinstance(x_notnan[0], (bool, int, float, np.float, np.double, np.integer)):
         __check_numeric_col(d, cn)
-    
+
     print('\n')
 
 def zen2han_num(x):
@@ -145,7 +144,7 @@ def calc_date_str(date_str, unit='months', qty=1, date_format='%Y-%m-%d'):
     if unit not in ['days', 'weeks', 'months', 'years']:
         raise ValueError('not implimented unit')
 
-    tmp_s = date_str    
+    tmp_s = date_str
     if type(date_str) == str:
         tmp_s = datetime.datetime.strptime(date_str, date_format)
 
@@ -157,7 +156,7 @@ def calc_date_str(date_str, unit='months', qty=1, date_format='%Y-%m-%d'):
         tmp_delta = dateutil.relativedelta.relativedelta(months=qty)
     elif unit=='years':
         tmp_delta = dateutil.relativedelta.relativedelta(years=qty)
-    
+
     ret = (tmp_s + tmp_delta).strftime(date_format)
 
     return(ret)
@@ -177,27 +176,27 @@ def round_datestr2quarter(date_str, date_format='%Y-%m-%d', direction='forward',
 
     if direction not in ['forward', 'backward']:
         raise ValueError('direction should be forward or backward')
-    
+
     if month not in ['head', 'tail']:
         raise ValueError('month should be head or tail')
 
     tmp_s = date_str
     if type(date_str)==str:
         tmp_s = datetime.datetime.strptime(date_str, date_format)
-        
+
     tmp_delta = dateutil.relativedelta.relativedelta(months=1)
 
     if month=='head':
         frac = 1
     elif month=='tail':
         frac = 0
-    
+
     tmp_date = tmp_s
     for i in range(4):
         if tmp_date.month % 3 == frac:
             break
         if direction=='forward':
-            tmp_date += tmp_delta 
+            tmp_date += tmp_delta
         elif direction=='backward':
             tmp_date -= tmp_delta
     ret = tmp_date.strftime(date_format)[:-2] + '01'

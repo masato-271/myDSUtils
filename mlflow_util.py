@@ -1,6 +1,6 @@
 # %%
 import os
-from pathlib import Path 
+from pathlib import Path
 import mlflow
 from mlflow import log_metric, log_param, log_params, log_artifacts, log_artifact
 
@@ -16,7 +16,6 @@ def mlflow_dump_src(target_dir='./', target_ext=['.py', '.r', '.lock', '.toml'],
                 log_artifact(p, artifact_path=artifact_path)
 
     return 0
-
 
 def mlflow_dump_feature_importance(d_importance, n_top = -1):
     if n_top > 0:
