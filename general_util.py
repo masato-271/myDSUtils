@@ -79,9 +79,9 @@ def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''
         prefix = prefix + '_'
 
     new_colname = f"{prefix}{agg_function.__name__}__{''.join(grouping_colnames)}__{target_colname}"
-    tmp_d = d.groupby(grouping_colnames)[target_colname].agg(__c1__ = agg_function)
-    tmp_d = tmp_d.rename({'__c1__':new_colname}, axis='columns')
-    d =  d.merge(tmp_d, on=grouping_colnames, how='left')
+    tmp_d = d.groupby(grouping_colnames)[target_colname].agg(__c1__=agg_function)
+    tmp_d = tmp_d.rename({'__c1__': new_colname}, axis='columns')
+    d = d.merge(tmp_d, on=grouping_colnames, how='left')
     return d
 
 def print_func_name(func):
@@ -90,7 +90,7 @@ def print_func_name(func):
         p = psutil.Process(os.getpid())
         m0 = p.memory_info()[0] / 2. ** 30
 
-        logger.info(func.__name__+'\t\t\tstart')
+        logger.info(func.__name__ + '\t\t\tstart')
         result = func(*args, **k)
 
         m1 = p.memory_info()[0] / 2. ** 30
@@ -103,7 +103,7 @@ def print_func_name(func):
     return f
 
 def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
-    if type(target_dir) == str:
+    if isinstance(target_dir, str):
         target_dir = Path(target_dir)
     archive_dir = target_dir / 'old'
 
@@ -112,20 +112,21 @@ def archive_old_files(target_dir: Path, target_ext: str, n_max_files=3):
 
     files = [x for x in target_dir.iterdir() if x.suffix == target_ext]
     files.sort()
-    archive_files = files[0:(len(files)-n_max_files)]
+    archive_files = files[0:(len(files) - n_max_files)]
     if len(archive_files) > n_max_files:
         for x in archive_files:
             shutil.move(x, archive_dir / x.name)
 
 def get_latest_filename(search_root_dir, target_suffix):
-  if type(search_root_dir) == str:
+  if isinstance(search_root_dir, str):
     search_root_dir = Path(search_root_dir)
   ret = []
   for p in search_root_dir.iterdir():
     if p.suffix == target_suffix:
       ret.append(p)
   ret.sort()
-  return(ret[-1])
+
+  return (ret[-1])
 
 
 def calc_date_str(date_str, unit='months', qty=1, date_format='%Y-%m-%d'):
@@ -145,21 +146,21 @@ def calc_date_str(date_str, unit='months', qty=1, date_format='%Y-%m-%d'):
         raise ValueError('not implimented unit')
 
     tmp_s = date_str
-    if type(date_str) == str:
+    if isinstance(date_str, str):
         tmp_s = datetime.datetime.strptime(date_str, date_format)
 
-    if unit=='days':
+    if unit == 'days':
         tmp_delta = dateutil.relativedelta.relativedelta(days=qty)
-    elif unit=='weeks':
+    elif unit == 'weeks':
         tmp_delta = dateutil.relativedelta.relativedelta(weeks=qty)
-    elif unit=='months':
+    elif unit == 'months':
         tmp_delta = dateutil.relativedelta.relativedelta(months=qty)
-    elif unit=='years':
+    elif unit == 'years':
         tmp_delta = dateutil.relativedelta.relativedelta(years=qty)
 
     ret = (tmp_s + tmp_delta).strftime(date_format)
 
-    return(ret)
+    return (ret)
 
 
 def round_datestr2quarter(date_str, date_format='%Y-%m-%d', direction='forward', month='head'):
@@ -181,23 +182,23 @@ def round_datestr2quarter(date_str, date_format='%Y-%m-%d', direction='forward',
         raise ValueError('month should be head or tail')
 
     tmp_s = date_str
-    if type(date_str)==str:
+    if isinstance(date_str, str):
         tmp_s = datetime.datetime.strptime(date_str, date_format)
 
     tmp_delta = dateutil.relativedelta.relativedelta(months=1)
 
-    if month=='head':
+    if month == 'head':
         frac = 1
-    elif month=='tail':
+    elif month == 'tail':
         frac = 0
 
     tmp_date = tmp_s
     for i in range(4):
         if tmp_date.month % 3 == frac:
             break
-        if direction=='forward':
+        if direction == 'forward':
             tmp_date += tmp_delta
-        elif direction=='backward':
+        elif direction == 'backward':
             tmp_date -= tmp_delta
     ret = tmp_date.strftime(date_format)[:-2] + '01'
-    return(ret)
+    return (ret)

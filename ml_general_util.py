@@ -23,7 +23,7 @@ def get_unique_value_count(d):
 def drop_unique_value_column(d):
     _d = get_unique_value_count(d)
     _cn = list(_d.query('n_unique == 1').colname.values)
-    if(len(_cn)>0):
+    if (len(_cn) > 0):
         print('following column(s) drop')
         print(_cn)
         d.drop(_cn, axis='columns', inplace=True)
@@ -42,6 +42,8 @@ def is_ipython_env():
     if 'get_ipython' not in globals():
         # Python shell
         return False
+
+    # 個々から先はipykernelで動いている筈。なので、get_ipython()が暗示的にインポートされて使える筈
     env_name = get_ipython().__class__.__name__
     if env_name == 'TerminalInteractiveShell':
         # IPython shell
@@ -59,8 +61,8 @@ def bind_data(d_train, d_test):
 
 @print_func_name
 def resplit_data(d):
-    d_train = d[d['data_type']=='train'].drop('data_type', axis='columns').copy()
-    d_test = d[d['data_type']=='test'].drop('data_type', axis='columns').copy()
+    d_train = d[d['data_type'] == 'train'].drop('data_type', axis='columns').copy()
+    d_test = d[d['data_type'] == 'test'].drop('data_type', axis='columns').copy()
     return (d_train, d_test)
 
 from pathlib import Path
@@ -93,7 +95,7 @@ def add_agg_stats_cols(
     agg_targets: List[str],
     agg_functions: List[str]
 ):
-  if type(agg_targets) == str:
+  if isinstance(agg_targets, str):
     agg_targets = [agg_targets]
 
   tmp_d1 = d[d['data_type'] == 'train'].copy()
@@ -124,11 +126,11 @@ def get_top_diff_df(y, pred, n_sample=100, mode='head'):
 def compare_pred_gt_plot(y, pred, fn='', log=''):
     plt.clf()
     f, ax = plt.subplots(figsize=(7,7))
-    if log=='x':
+    if log == 'x':
         ax.set(xscale='log')
-    elif log=='y':
+    elif log == 'y':
         ax.set(yscale='log')
-    elif log=='xy':
+    elif log == 'xy':
         ax.set(xscale='log', yscale='log')
 
     sns.histplot(y, binwidth=2, ax=ax, color='red')

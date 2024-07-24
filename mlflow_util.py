@@ -17,7 +17,7 @@ def mlflow_dump_src(target_dir='./', target_ext=['.py', '.r', '.lock', '.toml'],
 
     return 0
 
-def mlflow_dump_feature_importance(d_importance, n_top = -1):
+def mlflow_dump_feature_importance(d_importance, n_top=-1):
     if n_top > 0:
         d_top = d_importance.head(n_top).reset_index(drop=True)
         fn = f'top_{n_top}__feature_importance.csv'
