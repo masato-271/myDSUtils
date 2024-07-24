@@ -72,18 +72,6 @@ def zen2han_num(x):
     x = x.replace("９", "9")
     return x
 
-def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''):
-    if type(grouping_colnames) is not list:
-        grouping_colnames = [grouping_colnames]
-    if prefix != '':
-        prefix = prefix + '_'
-
-    new_colname = f"{prefix}{agg_function.__name__}__{''.join(grouping_colnames)}__{target_colname}"
-    tmp_d = d.groupby(grouping_colnames)[target_colname].agg(__c1__=agg_function)
-    tmp_d = tmp_d.rename({'__c1__': new_colname}, axis='columns')
-    d = d.merge(tmp_d, on=grouping_colnames, how='left')
-    return d
-
 def print_func_name(func):
     def f(*args, **k):
         t0 = datetime.datetime.now()

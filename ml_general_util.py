@@ -181,3 +181,16 @@ def get_n_best_shap_mat(d, n=3, value_mode=''):
 def cleanse_colname(colnames):
   ret = ["".join(c if c.isalnum() else "_" for c in str(x)) for x in colnames]
   return ret
+
+@print_func_name
+def add_target_enc(d, target_colname, grouping_colnames, agg_function, prefix=''):
+    if type(grouping_colnames) is not list:
+        grouping_colnames = [grouping_colnames]
+    if prefix != '':
+        prefix = prefix + '_'
+
+    new_colname = f"{prefix}{agg_function.__name__}__{''.join(grouping_colnames)}__{target_colname}"
+    tmp_d = d.groupby(grouping_colnames)[target_colname].agg(__c1__=agg_function)
+    tmp_d = tmp_d.rename({'__c1__': new_colname}, axis='columns')
+    d = d.merge(tmp_d, on=grouping_colnames, how='left')
+    return d

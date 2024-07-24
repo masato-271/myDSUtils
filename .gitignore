@@ -39,3 +39,4 @@ rsconnect/
 .DS_Store
 
 *.pyc
+.vscode/settings.json
